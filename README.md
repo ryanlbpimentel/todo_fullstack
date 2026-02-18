@@ -23,5 +23,5 @@
 ### Ferramentas
 - **Git + GitHub**
 - **VS Code**
-- **pgAdmin 4/DBeaver**
-- **Bruno API / Swagger UI Express** (para rodar comandos, testar endpoints e documentar api)
+- **pgAdmin 4 / DBeaver**
+- **Bruno / Swagger** (para rodar comandos, testar endpoints e documentar api)
