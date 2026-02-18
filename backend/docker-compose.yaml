@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres
+    container_name: todo_fullstack
+    restart: unless-stopped
+    env_file: 
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+volumes:
+  postgres_data:
