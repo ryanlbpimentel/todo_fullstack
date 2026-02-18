@@ -24,4 +24,4 @@
 - **Git + GitHub**
 - **VS Code**
 - **pgAdmin 4 / DBeaver**
-- **Bruno / Swagger** (para rodar comandos, testar endpoints e documentar api)
+- **Bruno / Swagger** (testar requisição, endpoints e documentar api)
