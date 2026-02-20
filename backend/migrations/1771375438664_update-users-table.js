@@ -1,14 +1,11 @@
-const shorthands = undefined;
+export const up = (pgm) => {
 
-const up = (pgm) => {
-
-    pgm.addColumn('usuarios', {
-        nivel_permissao: { type: 'int', notNull: true, default: '0' },
+    pgm.addColumn('users', {
+        permission_level: { type: 'int', notNull: true, default: '0' },
     });
 };
 
-const down = (pgm) => {
-    pgm.dropColumn('usuarios', 'nivel_permissao');
+export const down = (pgm) => {
+    pgm.dropColumn('users', 'permission_level');
 };
 
-module.exports = { shorthands, up, down };

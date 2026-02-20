@@ -1,14 +1,220 @@
 {
-  "openapi": "3.1.1",
+  "openapi": "3.0.0",
   "info": {
-    "title": "API Todo List",
+    "title": "Tasks API",
     "version": "1.0.0",
-    "description": "API de gerenciamento de tarefas com autenticação JWT"
+    "description": "API with JWT authentication, task management and admin controls."
   },
   "servers": [
-    {
-      "url": "http://localhost:3001",
-      "description": "Servidor local"
+    { "url": "http://localhost:3001", "description": "Local server for API testing" }
+  ],
+  "tags": [
+    { "name": "Status", "description": "API health check" },
+    { "name": "Authentication", "description": "User registration and login" },
+    { "name": "Tasks", "description": "Task operations (requires authentication)" },
+    { "name": "Admin", "description": "Administrative operations (permission level 2)" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "schemas": {
+      "user": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "user full name", "example": "admin" },
+          "email": { "type": "string", "description": "user email", "example": "admin@gmail.com" }
+        }
+      },
+      "Login": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "example": "admin@gmail.com" },
+          "password": { "type": "string", "example": "654321" }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string", "description": "JWT token" }
+        }
+      },
+      "Tarefa": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "user_id": { "type": "integer" },
+          "title": { "type": "string", "example": "Nova tarefa" },
+          "description": { "type": "string", "example": "Descrição da tarefa" },
+          "completed": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      }
     }
-  ]
+  },
+  "paths": {
+    "/status": {
+      "get": {
+        "tags": ["Status"],
+        "summary": "Check API status",
+        "responses": {
+          "200": { "description": "API and DB are reachable", "content": { "application/json": { "example": { "message": "API and DB are alive" } } } },
+          "500": { "description": "Database connection failed" }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/user" },
+              "example": { "name": "admin", "email": "admin@gmail.com", "password": "654321"}
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created" },
+          "400": { "description": "Validation error" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Login" },
+              "example": { "email": "admin@gmail.com", "password": "654321" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginResponse" } } } },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/task/list": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "List tasks for authenticated user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Array of tasks", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Tarefa" } } } } },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/task/create": {
+      "post": {
+        "tags": ["Tasks"],
+        "summary": "Create a new task",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Tarefa" },
+              "example": { "title": "Nova tarefa", "description": "Descrição da tarefa" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Task created" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/task/update/{id}": {
+      "patch": {
+        "tags": ["Tasks"],
+        "summary": "Update a task by id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "example": { "title": "Atualizado", "description": "Nova descrição", "completed": true } } }
+        },
+        "responses": {
+          "200": { "description": "Task updated" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Task not found" }
+        }
+      }
+    },
+    "/task/delete/{id}": {
+      "delete": {
+        "tags": ["Tasks"],
+        "summary": "Delete a task by id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": {
+          "200": { "description": "Task deleted" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Task not found" }
+        }
+      }
+    },
+    "/admin/list": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "List users (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Array of users", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/user" } } } } },
+          "403": { "description": "Access denied" }
+        }
+      }
+    },
+    "/admin/list/{id}": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get user by ID (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": {
+          "200": { "description": "User found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/user" } } } },
+          "403": { "description": "Access denied" },
+          "404": { "description": "User not found" }
+        }
+      }
+    },
+    "/admin/create": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Create user (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "example": { "name": "Ryan", "email": "ryan@gmail.com", "password": "123456"} } }
+        },
+        "responses": { "201": { "description": "User created" }, "403": { "description": "Access denied" } }
+      }
+    },
+    "/admin/delete/{id}": {
+      "delete": {
+        "tags": ["Admin"],
+        "summary": "Delete user (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": { "200": { "description": "User deleted" }, "403": { "description": "Access denied" }, "404": { "description": "User not found" } }
+      }
+    }
+  }
 }

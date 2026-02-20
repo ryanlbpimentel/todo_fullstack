@@ -1,44 +1,44 @@
-CREATE TABLE usuarios (
-    id BIGSERIAL PRIMARY KEY,
-    nome TEXT NOT NULL,
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    senha_hash TEXT NOT NULL,
-    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE tarefas (
-    id BIGSERIAL PRIMARY KEY,
-    usuario_id BIGINT NOT NULL,
-    titulo TEXT NOT NULL,
-    descricao TEXT,
-    concluida BOOLEAN NOT NULL DEFAULT FALSE,
-    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+CREATE TABLE tasks (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    completed BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-  CONSTRAINT fk_tarefas_usuario
-    FOREIGN KEY (usuario_id)
-    REFERENCES usuarios(id)
+  CONSTRAINT fk_tasks_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
     ON DELETE CASCADE
 );
 
-CREATE INDEX index_tarefas_usuario_id
-    ON tarefas(usuario_id);
+CREATE INDEX index_tasks_user_id
+    ON tasks(user_id);
 
-CREATE FUNCTION set_atualizado_em()
-RETURN TRIGGER AS $$
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
 BEGIN
-    NEW.atualizado_em = NOW()
+    NEW.updated_at = NOW(); 
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_usuarios_atualizados_em
-BEFORE UPDATE ON usuarios
+CREATE OR REPLACE TRIGGER trigger_users_updated_at
+BEFORE UPDATE ON users
 FOR EACH ROW
-EXECUTE FUNCTION set_atualizado_em();
+EXECUTE FUNCTION set_updated_at();
 
-CREATE TRIGGER trigger_tarefas_atualizados_em
-BEFORE UPDATE ON tarefas
+CREATE OR REPLACE TRIGGER trigger_tasks_updated_at
+BEFORE UPDATE ON tasks
 FOR EACH ROW
-EXECUTE FUNCTION set_atualizado_em();
+EXECUTE FUNCTION set_updated_at();
