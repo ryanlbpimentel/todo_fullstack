@@ -1,8 +1,7 @@
 import jwt from "jsonwebtoken";
-import { listUserById } from "../services/adminServices.js";
+import { listUserById } from "../../modules/roles/roles.repository.js";
 
 async function auth(req, res, next) {
-    console.log("authenticating");
     if (!req.headers || !req.headers.authorization) return res.status(401).json({ error: "Authorization header missing" });
 
     const [type, token] = req.headers.authorization.split(' ');

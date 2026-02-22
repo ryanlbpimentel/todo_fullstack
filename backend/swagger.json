@@ -3,7 +3,7 @@
   "info": {
     "title": "Tasks API",
     "version": "1.0.0",
-    "description": "API with JWT authentication, task management and admin controls."
+    "description": "API with JWT authentication, task management and roles controls."
   },
   "servers": [
     { "url": "http://localhost:3001", "description": "Local server for API testing" }
@@ -12,7 +12,7 @@
     { "name": "Status", "description": "API health check" },
     { "name": "Authentication", "description": "User registration and login" },
     { "name": "Tasks", "description": "Task operations (requires authentication)" },
-    { "name": "Admin", "description": "Administrative operations (permission level 2)" }
+    { "name": "Roles", "description": "Administrative operations (permission level 2)" }
   ],
   "components": {
     "securitySchemes": {
@@ -64,7 +64,7 @@
         }
       }
     },
-    "/auth/register": {
+    "/user/register": {
       "post": {
         "tags": ["Authentication"],
         "summary": "Register user",
@@ -83,7 +83,7 @@
         }
       }
     },
-    "/auth/login": {
+    "/user/login": {
       "post": {
         "tags": ["Authentication"],
         "summary": "User login",
@@ -167,10 +167,10 @@
         }
       }
     },
-    "/admin/list": {
+    "/roles/list": {
       "get": {
-        "tags": ["Admin"],
-        "summary": "List users (Admin)",
+        "tags": ["Roles"],
+        "summary": "List users (permission_level 2 required)",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": { "description": "Array of users", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/user" } } } } },
@@ -178,10 +178,10 @@
         }
       }
     },
-    "/admin/list/{id}": {
+    "/roles/list/{id}": {
       "get": {
-        "tags": ["Admin"],
-        "summary": "Get user by ID (Admin)",
+        "tags": ["Roles"],
+        "summary": "Get user by ID (permission_level 2 required)",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
@@ -193,10 +193,10 @@
         }
       }
     },
-    "/admin/create": {
+    "/roles/create": {
       "post": {
-        "tags": ["Admin"],
-        "summary": "Create user (Admin)",
+        "tags": ["Roles"],
+        "summary": "Create user (permission_level 2 required)",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -205,10 +205,10 @@
         "responses": { "201": { "description": "User created" }, "403": { "description": "Access denied" } }
       }
     },
-    "/admin/delete/{id}": {
+    "/roles/delete/{id}": {
       "delete": {
-        "tags": ["Admin"],
-        "summary": "Delete user (Admin)",
+        "tags": ["Roles"],
+        "summary": "Delete user (permission_level 2 required)",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }

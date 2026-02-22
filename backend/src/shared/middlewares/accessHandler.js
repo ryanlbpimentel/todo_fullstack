@@ -1,6 +1,5 @@
 function access(required_level) {
     return function (req, res, next) {
-        console.log("accessing");
 
         if (!req.user) return res.status(401).json({ error: "User not authenticated" });
 
