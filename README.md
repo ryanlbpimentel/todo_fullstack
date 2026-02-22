@@ -6,7 +6,7 @@
 - **Node.js**
 - **Express**
 - **pg**
-- **jsonwebtoken (JWT)**
+- **jwt**
 - **bcrypt**
 - **dotenv**
 - **cors**
@@ -23,5 +23,5 @@
 ### Ferramentas
 - **Git + GitHub**
 - **VS Code**
-- **pgAdmin 4 / DBeaver**
-- **Bruno / Swagger** (testar requisição, endpoints e documentar api)
+- **DBeaver**
+- **Swagger** (testar requisição, endpoints e documentar api)
