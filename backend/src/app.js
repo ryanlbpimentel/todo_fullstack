@@ -1,12 +1,13 @@
 import "dotenv/config";
 import express from "express";
 import pool from "./db.js";
-import dbMiddleware from "./middlewares/dbCheck.js";
-import taskRoutes from "./routes/task.js";
-import authRoutes from "./routes/auth.js";
-import adminRoutes from "./routes/admin.js";
+import dbMiddleware from "./shared/middlewares/dbHandler.js";
+import taskRoutes from "./modules/task/task.routes.js";
+import userRoutes from "./modules/user/user.routes.js";
+import roleRoutes from "./modules/roles/roles.routes.js";
 import swaggerUi from "swagger-ui-express";
 import fs from "fs";
+import { errorHandler } from "./shared/errors/globalErrorHandler.js";
 
 const swaggerDocument = JSON.parse(
   fs.readFileSync(new URL("../swagger.json", import.meta.url))
@@ -27,9 +28,11 @@ app.get("/status", async (req, res) => {
 
 app.use(dbMiddleware)
 app.use("/task",taskRoutes);
-app.use("/auth",authRoutes);
-app.use("/admin",adminRoutes);
+app.use("/user",userRoutes);
+app.use("/roles",roleRoutes);
 app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.use(errorHandler);
 
 const port = process.env.PORT || 3001;
 app.listen(port, () =>

@@ -1,13 +1,13 @@
-import pool from "../db.js";
+import pool from "../../db.js";
 
 export async function listUsers(){
     const result = await pool.query("SELECT id,name,email,created_at,updated_at,permission_level FROM users");
-    return result;
+    return result.rows;
 }
 
 export async function listUserById(id){
     const result = await pool.query("SELECT id,name,email,created_at,updated_at,permission_level FROM users WHERE id = $1",[id]);
-    return result;
+    return result.rows[0];
 }
 
 export async function deleteUser(id){
